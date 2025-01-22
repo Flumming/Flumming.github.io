@@ -1,1 +1,115 @@
-"Hello World" 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedural Terrain Generation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background: #35424a;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 2rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #35424a;
+        }
+        code {
+            background: #eaeaea;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 1rem;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #35424a;
+            color: #fff;
+        }
+        a {
+            color: #35424a;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Procedural Terrain Generation</h1>
+    </header>
+    <div class="container">
+        <h2>Introduction</h2>
+        <p>Welcome to my blog post on <strong>procedural terrain generation</strong>. In this post, I'll walk you through how I created dynamic terrains using algorithms and techniques in C++. This approach can be used for games, simulations, or artistic purposes.</p>
+
+        <h2>Key Concepts</h2>
+        <p>Here are some of the concepts involved:</p>
+        <ul>
+            <li>Perlin Noise and Simplex Noise for heightmaps</li>
+            <li>Biomes and their transitions</li>
+            <li>Efficient rendering of large terrains</li>
+        </ul>
+
+        <h2>Implementation</h2>
+        <p>The code below demonstrates a snippet of the noise generation:</p>
+        <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cmath&gt;
+
+float perlinNoise(float x, float y) {
+    // Simple Perlin Noise implementation
+    return std::sin(x * y) * 0.5f + 0.5f;
+}
+
+int main() {
+    for (int y = 0; y < 10; ++y) {
+        for (int x = 0; x < 10; ++x) {
+            std::cout << perlinNoise(x, y) << " ";
+        }
+        std::cout << std::endl;
+    }
+    return 0;
+}</code></pre>
+
+        <h2>Results</h2>
+        <p>Here's an example of the terrain generated:</p>
+        <img src="terrain_example.png" alt="Procedural Terrain Example">
+
+        <h2>Conclusion</h2>
+        <p>Procedural terrain generation offers limitless possibilities for creativity and realism in virtual environments. Let me know what you think of this approach or if you have suggestions for further improvements!</p>
+
+        <p>Feel free to explore the <a href="#">full source code on GitHub</a>.</p>
+    </div>
+    <footer>
+        <p>&copy; 2025 Your Name. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -14,10 +14,13 @@
             color: #333;
         }
         header {
-            background: #35424a;
-            color: #fff;
+            background: #0c3564;
+            color: #ffffff;
             padding: 1rem 0;
             text-align: center;
+        }
+        header h1 {
+            color: #ffffff;
         }
         .container {
             max-width: 800px;
@@ -26,14 +29,34 @@
             padding: 2rem;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            margin: 0px;
+        }
+
+        .image-text {
+            position: absolute;
+            top: 16px; 
+            left: 0px;
+            background-color: rgb(197, 197, 197); 
+            color: black; 
+            padding: 2px 5px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 0px;
+        }
         h1, h2, h3 {
             color: #35424a;
         }
+        p {
+            margin: 0; 
+            margin-bottom: 0rem; 
+        }   
         code {
-            background: #eaeaea;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.95em;
+            font-family: monospace;
+            color: #333;
+            padding: 2px;
         }
         pre {
             background: #f4f4f4;
@@ -63,53 +86,68 @@
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Procedural Terrain Generation</h1>
     </header>
     <div class="container">
         <h2>Introduction</h2>
-        <p>Welcome to my blog post on <strong>procedural terrain generation</strong>. In this post, I'll walk you through how I created dynamic terrains using algorithms and techniques in C++. This approach can be used for games, simulations, or artistic purposes.</p>
-
-        <h2>Key Concepts</h2>
-        <p>Here are some of the concepts involved:</p>
-        <ul>
-            <li>Perlin Noise and Simplex Noise for heightmaps</li>
-            <li>Biomes and their transitions</li>
-            <li>Efficient rendering of large terrains</li>
-        </ul>
+        <p>This is my blog post on <strong>procedural terrain generation</strong>. My blog post is about procedural terrain generation. The terrain of a game is really important, especially in an open-world game, because that’s where you spend most of your time. Creating realistic and dynamic terrains adds a lot to the experience of a game, but it’s also one of the more challenging parts to get right. In this post I'll go though the way how I made a basic terrain generator.</p>
 
         <h2>Implementation</h2>
-        <p>The code below demonstrates a snippet of the noise generation:</p>
-        <pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;cmath&gt;
+        <h3>Step One, Noise</h3>
+        <p>The first thing you need for terrain is a heightmap, this is used to determite how high the terrain will be at a specific place. To make this heightmap I make use of perlin noise.</p> 
+        <p>In this code snippet you can see how I populate the noise vector.</p>
+<pre><code></code>std::vector<float> noise(width * height);
 
-float perlinNoise(float x, float y) {
-    // Simple Perlin Noise implementation
-    return std::sin(x * y) * 0.5f + 0.5f;
-}
+ for (int y = 0; y < height; y++) {
+     for (int x = 0; x < width; x++) {
+         float noiseValue = perlin.octave2D(x ,y, octaves);
+         noise[index] = noiseValue;  
+     }
+ }
+</code></pre>
+        <p>Simply creating a map with perlin noise does not provide enough detail. To make it more detailed you need to increase the number of octaves in the perlin noise.</p>
+        <p>Here's the difference between using 1 octave and 4 octaves.</p>
+        <iframe frameborder="0" class="juxtapose" width="400" height="400" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=7c176a36-d8f2-11ef-9397-d93975fe8866"></iframe>
 
-int main() {
-    for (int y = 0; y < 10; ++y) {
-        for (int x = 0; x < 10; ++x) {
-            std::cout << perlinNoise(x, y) << " ";
-        }
-        std::cout << std::endl;
-    }
-    return 0;
-}</code></pre>
+        <h3>Step Two, Elevation</h3>
+        <p>Now that you have the height data for your terrain you need to apply it somewhere. I first create a flat plane mesh, and then for each vertex I check the heightmap to find the corresponding heigt based on its position.</p>
+        <p>If I apply the heightmap to a flat plane, it will look like this:</p>
+        <img src="assets/heightn1.png" alt="MeshHeightMap" width="400" height="400">
+        <p>The issue with this terrain is that it looks really blend, It doesnt have high mountains or flat land. You can fix this by raising the height to a power.</p>
+<pre><code></code>for (int y = 0; y < height; y++) {
+     for (int x = 0; x < width; x++) {
+         float height = noise[x + y * width];
+         elevation[x + y * width] = pow(height, n);
+     }
+ }
+</code></pre>
+
+        <div class="image-container">
+            <div class="image-text">n=1</div>
+            <img src="assets/heightn1.png" alt="MeshHeightMap" width="150" height="150">
+        </div>
+
+        <div class="image-container">
+            <div class="image-text">n=2</div>
+            <img src="assets/heightn2.png" alt="MeshHeightMap" width="150" height="150">
+        </div>
+
+        <div class="image-container">
+            <div class="image-text">n=3</div>
+            <img src="assets/heightn3.png" alt="MeshHeightMap" width="150" height="150">
+        </div>
+
+        <div class="image-container">
+            <div class="image-text">n=4</div>
+            <img src="assets/heightn4.png" alt="MeshHeightMap" width="150" height="150">
+        </div>
 
         <h2>Results</h2>
-        <p>Here's an example of the terrain generated:</p>
-        <img src="terrain_example.png" alt="Procedural Terrain Example">
 
         <h2>Conclusion</h2>
-        <p>Procedural terrain generation offers limitless possibilities for creativity and realism in virtual environments. Let me know what you think of this approach or if you have suggestions for further improvements!</p>
-
-        <p>Feel free to explore the <a href="#">full source code on GitHub</a>.</p>
     </div>
-    <footer>
-        <p>&copy; 2025 Your Name. All rights reserved.</p>
-    </footer>
 </body>
 </html>

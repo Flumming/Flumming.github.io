@@ -105,7 +105,7 @@
 
         <h3>Step One, Noise</h3>
 
-        <p>The first step in creating terrain is generating a heightmap, which determines the elevation of the terrain at specific points. To make this heightmap I make use of perlin noise, this is a technique that creates smooth, natural looking gradients.</p> 
+        <p>The first step in creating terrain is generating a heightmap, which determines the elevation of the terrain at specific points. To make this heightmap I make use of perlin noise, this is a technique that creates smooth, natural looking gradients. Perlin noise is a way to generate random-looking patterns that are smooth and continuous, which makes it great for natural shapes like terrain. Instead of just picking random values, it interpolates between gradients, so the result has no sharp jumps.</p> 
         <p>In this code snippet you can see how I populate the noise vector.</p>
 <pre><code></code>std::vector<float> noise(width * height);
 
@@ -116,23 +116,27 @@
      }
  }
 </code></pre>
-        <p>Simply creating a map with perlin noise does not provide enough detail. To make it more detailed you need to increase the number of octaves in the perlin noise.</p>
+        <p>In this code snippet it goes over the width and height of the terrain and generates a value from a noise function from the siv::PerlinNoise library. It then stores this in an array for later use.</p>
+        <h4>Octaves</h4>
+        <p>Simply creating a map with perlin noise does not provide enough detail. To make it more detailed you need to increase the number of octaves in the perlin noise. Octaves are basically layers of noise added on top of each other, each one with a higher frequency and lower amplitude. The first octave gives you the broad shape of the terrain, and the ones after that add smaller and smaller details. You usually combine them all together to get a more complex and realistic result.</p>
         <p>Here's the difference between using 1 octave and 4 octaves.</p>
         <iframe frameborder="0" class="juxtapose" width="400" height="400" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=7c176a36-d8f2-11ef-9397-d93975fe8866"></iframe>
 
         <h3>Step Two, Elevation</h3>
 
-        <p>Now that you have the height data for your terrain you need to apply it to a mesh. I start with creating a flat plane mesh and then for each vertex, I check the heightmap to find the corresponding height based on its position.</p>
+        <p>Now that you have the height data for your terrain you need to apply it to a mesh. I start with creating a flat plane mesh and then for each vertex, I check the noise map to find the corresponding height based on its position.</p>
         <p>When applying the heightmap directly to a flat plane, it looks like this:</p>
         <img src="assets/2elevation/heightn1.png" alt="MeshHeightMap" width="400" height="400">
-        <p>The issue with this terrain is that it looks really bland, It doesnt have high mountains or flat land. You can fix this by raising the height to a power.</p>
+        <p>The issue with this terrain is that it looks really bland, It doesnt have high mountains or flat land. You can fix this by raising the height to a power. Raising the height to a power changes the shape of the noise curve, which helps exaggerate the terrain. If you use a power less than 1, you get more flat areas like plains or plateaus. If you use a power greater than 1, it pushes the lower areas down and pulls the higher areas up, creating steeper mountains and deeper valleys.</p>
 <pre><code>for (int y = 0; y < height; y++) {
      for (int x = 0; x < width; x++) {
-         float height = noise[x + y * width];
-         elevation[x + y * width] = pow(height, n);
+        float height = pow(noise[x + y * width], 4);
+        positions.push_back(vec3(x, terrainHeight,y));
      }
  }
 </code></pre>
+        <p>In this loop the code once again goes over the width and height of the terrain, it then gets the noise value from the noise vector, then scales it using a power and sets the positions of the vertices to the height.</p>
+        <p>The images below show what diffrent powers do to the terrain.</p>
 
         <div class="image-container">
             <div class="image-text">n=1</div>
@@ -164,16 +168,66 @@
     glm::vec3 color;
 };
 
-std::vector<TerrainColor> terrainColors = {{"DeepWater",    0.20f, glm::vec3(35, 60, 182)},
-                             {"Water",        0.30f, glm::vec3(46, 81, 255)},
-                             {"Beach",        0.35f, glm::vec3(245, 245, 122)},
-                             {"Grass",        0.55f, glm::vec3(24, 212, 11)},
-                             {"HighGrass",    0.75f, glm::vec3(14, 135, 5)},
-                             {"Mountain",     0.80f, glm::vec3(115, 113, 111)},
-                             {"HighMountain", 0.95f, glm::vec3(56, 56, 55)},
-                             {"Snow",         1.00f, glm::vec3(255, 255, 255)}};
+std::vector<TerrainColor> terrainColors = {
+                               {"DeepWater",    0.20f, glm::vec3(35, 60, 182)},
+                               {"Water",        0.30f, glm::vec3(46, 81, 255)},
+                               {"Beach",        0.35f, glm::vec3(245, 245, 122)},
+                               {"Grass",        0.55f, glm::vec3(24, 212, 11)},
+                               {"HighGrass",    0.75f, glm::vec3(14, 135, 5)},
+                               {"Mountain",     0.80f, glm::vec3(115, 113, 111)},
+                               {"HighMountain", 0.95f, glm::vec3(56, 56, 55)},
+                               {"Snow",         1.00f, glm::vec3(255, 255, 255)}  
+                            };
 </code></pre>
-        <p>After applying these values for the height and the color to the mesh I blend the edges together so it doesn´t have rigged edges. I do this by calculating how far away a specific point is from a border and interpolate between the two bordering colors. You can see the diffrence that blending the colors make here.</p>
+        <p>These values are used by the shader to color the terrain. It gets the color from this function in the shader code.</p>
+<pre><code>vec3 getColor(float height) {
+    vec3 color = vec3(1.0); 
+    for (int i = 0; i < numItems; ++i) {
+        if (height <= colorMap[i].colorHeight) {
+            color = colorMap[i].color.rgb;
+            break;
+        }
+    }
+    return color;
+}
+</code></pre>
+        <p>In this function it takes the height as an input and gives the color as the output. It goes over the full list of the colors, then it checks if the height is lower then the height of the current index in the color list. If so then it return that color to be used for the terrain.</p>
+
+        <p>After applying these values for the height and the color to the mesh I blend the edges together so it doesn´t have rigged edges. I do this by calculating how far away a specific point is from a border and interpolate between the two bordering colors. I have added the following code for this to the GetColor function.</p>
+<pre><code>//Changed code in GetColor function
+for (int i = 0; i < currentBiome.numItems; ++i) {
+    float blendRange = 0.05;
+    if (height <= colorMap[i].colorHeight + blendRange) {
+        if (i == numItems) {
+            color = colorMap[i].color.rgb;
+        } else {
+            color = blendColor(blendRange, height, i);
+        }
+        break;
+    }
+}
+
+//Functin for blending colors
+vec3 blendColor(float blendRange, float height, int index) {
+    vec3 color = vec3(1.0);
+    float lowerBound = colorMap[index].colorHeight - blendRange;
+    float upperBound = colorMap[index].colorHeight + blendRange;
+
+    if (height >= lowerBound && height <= upperBound) {
+        float blendFactor = (height - lowerBound) / (upperBound - lowerBound);
+
+        vec3 lowerColor = colorMap[index].color.rgb;
+        vec3 upperColor = colorMap[index + 1].color.rgb;
+
+        color = mix(lowerColor, upperColor, blendFactor);
+    } else {
+        color = colorMap[index].color.rgb;
+    }
+    return color;
+}
+</code></pre>
+        <p>In the added code to the GetColor function I have set a blend range. In the blendColor function it checks if the height is near the edge of where the color changes, if so it calculates the blend factor based on how far away the height is from the color change. It then mixes the two colors together and return that to apply it to the mesh.</p>
+        <p>In the slider below you can see the diffrence that blending the colors make here.</p>
         <iframe frameborder="0" class="juxtapose" width="400" height="400" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=382e4a86-d95d-11ef-9397-d93975fe8866"></iframe>
         
         <h3>Step Four, Biomes</h3>
@@ -195,8 +249,56 @@ std::vector<TerrainColor> terrainColors = {{"DeepWater",    0.20f, glm::vec3(35,
             <img src="assets/4biomes/biomeMap.png" alt="MeshHeightMap" width="250" height="250">
         </div>
         
+        <p>For each biome there is a now a vector of TerrainColor structs so that each biome can be have diffrent colors. In the shader it first calculates which index should be used for getting the colors, this is done in this function.</p>
+<pre><code>const int biomeTable[6][6] = int[][](
+    int[](0, 1, 2, 3, 3, 3),  // 0: Ice, 1: Tundra, 2: Grassland, 3: Desert
+    int[](0, 1, 2, 3, 3, 3),
+    int[](0, 1, 4, 4, 5, 5),  // 4: Forest, 5: Savanna
+    int[](0, 1, 6, 4, 5, 5),  // 6: Snow Forest
+    int[](0, 1, 6, 4, 7, 7),  // 7: Jungle
+    int[](0, 1, 6, 4, 7, 7)
+);
+
+int getBiomeIndex(float moisture, float temperature) {
+    for (int i = 0; i < 6; ++i) {
+        if (moisture >= moistureRanges[i] && moisture < moistureRanges[i + 1]) {
+            moistureIndex = i;
+            break;
+        }
+    }
+
+    for (int i = 0; i < 6; ++i) {
+        if (temperature >= temperatureRanges[i] && temperature < temperatureRanges[i + 1]) {
+            temperatureIndex = i;
+            break;
+        }
+    }
+    return biomeTable[moistureIndex][temperatureIndex];
+}
+</code></pre>
+        <p>It first calculates the moisture index based on the moisture from another perlin map, and it then does the same for the temperature. It then looks at the biomeTable and return an int that references what biome that point of the terrain is.</p>
+
         <h3>Step Five, Textures</h3>
-        <p>With the terrain's structure and biomes complete, the next step is to make it look nicer by adding textures. I created a texture list that gets passed to the shader, where each color and height value corresponds to a specific texture ID.  </p>
+        <p>With the terrain's structure and biomes complete, the next step is to make it look nicer by adding textures. Now when I create the structs for the biome colors I have also added a texture ID next to the color and height values. This texture ID is a reference to the index in a texture list that is send to the shader.</p>
+        <p>The following code shows how I get a texture in the shader based on its biome index and height</p>
+<pre><code>vec3 getTexture(float height, int biomeIndex) {
+    int layer = 0;
+    biome_struct currentBiome = biomes[biomeIndex];
+    vec2 scaled_texture_coords = v_texture0 * terrainScale;
+    vec3 textureColor;
+    for (int i = 0; i < currentBiome.numItems; ++i) {
+        if (height <= currentBiome.colorMap[i].colorHeight) {
+            layer = currentBiome.colorMap[i].textureID; 
+            textureColor = texture(s_terrain_texture_array, vec3(scaled_texture_coords, layer)).rgb;
+            break;
+        }
+    }
+
+    return textureColor; 
+}
+</code></pre>
+        <p>This function kind of works the same as the GetColor function. But for this one it first calculates the texture coordinate in the texture using the texture position. It then goes over the color map of the current biome. If it is at the correct height it return the color of the pixel in the texture corresponding to that biome and height.</p>
+        <p>This is how the terrain now looks when applying the texture to the terrain</p>
         <img src="assets/5textures/textureexample.png" alt="texturing" width="400" height="400">
         
         <h3>Step Six, Details</h3>

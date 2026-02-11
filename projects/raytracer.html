@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxel Ray Tracer - Flemming van der Sande</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="../index.html">Home</a>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#contact">Contact</a>
+        <button id="theme-toggle">🌙 Theme</button>
+    </nav>
+
+    <header style="background-image: url('images/raytracer-banner.png');">
+        <h1>Voxel Ray Tracer</h1>
+        <div class="author-info">
+            Solo Project · C++ · 8 Weeks · Year 1 at BUas
+        </div>
+    </header>
+
+    <div class="container">
+
+        <h2>Overview</h2>
+        <p>
+            During an 8-week graphics programming project in my first year at Breda University of Applied Sciences, I built a <strong>CPU-based voxel ray tracer in C++</strong>. Starting from a basic voxel renderer, I implemented a range of lighting, material, and camera features while learning about light transport, linear algebra, and performance optimization.
+        </p>
+        <p>
+            The world is generated using Perlin noise and rendered through a DDA (Digital Differential Analyzer) grid traversal algorithm. Rays are traced recursively to support reflections and refractions.
+        </p>
+
+        <h2>Features</h2>
+
+        <h3>Lighting &amp; Shadows</h3>
+        <p>
+            I implemented three types of lights: <strong>point lights</strong>, <strong>spotlights</strong> with adjustable cone size and falloff, and <strong>directional lights</strong>. All lights cast hard shadows using shadow rays, for each surface point, a ray is traced toward the light source to check for occlusion.
+        </p>
+        <img src="../assets/raytracer/lights.png" alt="Scene showing point lights and spotlight with shadows">
+
+        <h3>Materials</h3>
+        <p>
+            I built a simple material system supporting diffuse surfaces, <strong>mirrors</strong> with recursive reflections, and <strong>glass</strong> using Snell's law for refraction and Schlick's approximation for the Fresnel effect. A recursion cap prevents infinite bounces.
+        </p>
+        <img src="../assets/raytracer/reflection.png" alt="Reflective material in the scene">
+        <img src="../assets/raytracer/glass.png" alt="Glass material in the scene">
+
+        <h3>HDR Skydome</h3>
+        <p>
+            Rays that don't hit any geometry sample an <strong>HDR environment map</strong>, giving the scene a natural-looking sky and providing ambient lighting for reflective surfaces.
+        </p>
+        
+        <img src="../assets/raytracer/skydome.png" alt="Scene with HDR skydome visible in the background">
+
+        <h2>What I Learned</h2>
+        <p>
+            This project gave me hands-on experience with recursive ray tracing, light transport and shadow calculations, physically-based material models like Fresnel and Snell's law, and CPU performance profiling. It was a great introduction to graphics programming and the math behind rendering.
+        </p>
+
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://github.com/Flumming" target="_blank">GitHub</a>
+            <a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/" target="_blank">LinkedIn</a>
+        </div>
+    </footer>
+
+    <script>
+        const toggle = document.getElementById('theme-toggle');
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            toggle.textContent = document.body.classList.contains('light-mode') ? '🌙 Dark' : '☀️ Light';
+        });
+    </script>
+
+</body>
+</html>

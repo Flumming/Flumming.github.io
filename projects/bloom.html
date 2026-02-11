@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom - Flemming van der Sande</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="../index.html">Home</a>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#contact">Contact</a>
+        <button id="theme-toggle">🌙 Theme</button>
+    </nav>
+
+    <header style="background-image: url('../assets/bloom/');">
+        <h1>Bloom</h1>
+        <div class="author-info">
+            Gameplay/Systems Programmer · Unreal Engine · 2024–2025 · 
+            <a href="https://buas.itch.io/bloom" target="_blank">Play on itch.io ↗</a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <h2>About the Project</h2>
+        <p>
+            <strong>Bloom</strong> is an eerie 3D gardening adventure game where you grow strange, unnatural plants to feed a mysterious creature holding you captive. You explore a hostile, atmospheric world to harvest grotesque fruit and fragments of your soul in a desperate attempt to earn your freedom.
+        </p>
+        <p>
+            The game was developed as a student project at Breda University of Applied Sciences by a multidisciplinary team of designers, programmers, and artists. I worked as one of three <strong>Gameplay/Systems Programmers</strong>, responsible for building core gameplay systems and UI.
+        </p>
+
+        <h2>My Contributions</h2>
+
+        <h3>Inventory System</h3>
+        <p>
+            I built the inventory system from scratch. Items have specific stack sizes, adding a duplicate item first fills existing stacks before occupying a new slot. The player can scroll through items and rearrange their inventory by selecting and swapping slots.
+        </p>
+        <!-- <img src="images/bloom/inventory.gif" alt="Inventory system showing item stacking and scrolling"> -->
+        <!-- <img src="images/bloom/switching.gif" alt="Item switching and rearranging in the inventory"> -->
+
+        <h3>Item Log</h3>
+        <p>
+            I created an item log notification that appears in the top-right corner whenever the player gains or loses an item. Each entry shows the item icon, the amount, and a + or − indicator. Multiple entries stack vertically.
+        </p>
+        <!-- <img src="images/bloom/itemlog.png" alt="Item log UI showing gained and lost items"> -->
+
+        <h3>Held Item Visualization</h3>
+        <p>
+            I implemented the visual switching of held items. When the player equips a tool like the shears or watering can, it appears in their hand. When switching away, the item gets stored on the player's body, the watering can clips onto the belt, and the shears go on the back.
+        </p>
+        <img src="../assets/bloom/itemswitchgif.gif" alt="Player switching between held items">
+
+        <h3>Shop System</h3>
+        <p>
+            One of the main systems I built was the shop. After discussing the design with a designer, I created a set of reusable widget blueprints: a cost item widget to display individual resource costs, a shop item widget that combines the buyable item with its cost list, and the shop grid itself that populates dynamically with available items.
+        </p>
+        <!-- <img src="images/bloom/shop.png" alt="Shop interface showing items and their costs"> -->
+
+        <h3>Creature Trading</h3>
+        <p>
+            The creature is a simpler trading system where the player can exchange a single item for a seed. I reused parts of the shop widget system to quickly build a new UI for this. The player can cycle through all available trades to buy different seeds.
+        </p>
+        <img src="../assets/bloom/newuicreature.png" alt="Creature trading UI">
+
+        <h3>Diegetic UI</h3>
+        <p>
+            I developed several in-world UI elements that appear in the game world rather than as part of the HUD.
+        </p>
+
+        <h4>Plant Upgrade &amp; Satisfaction</h4>
+        <p>
+            When approaching a plant, a UI panel appears above it showing the upgrade cost. It checks the player's inventory in real time and colors the text green or red based on whether they have enough resources. I also made a satisfaction indicator that shows how much water a plant has left, initially a progress bar, later redesigned into three water droplets.
+        </p>
+        <img src="../assets/bloom/allplantui.gif" alt="Plant upgrade UI and water droplets">
+
+        <h4>Interaction Prompts</h4>
+        <p>
+            Walking up to interactable objects like chests displays a diegetic prompt showing which button to press and what the action does. Each interaction type has its own prompt with custom art.
+        </p>
+        <img src="../assets/bloom/interactionopen.png" alt="Diegetic interaction prompts">
+
+        <h3>Sound Effects &amp; Music</h3>
+        <p>
+            At the end of the project I integrated the audio. Music tracks play on loop with automatic transitions between songs, and fade out when moving between indoor and outdoor areas. I also added tool sound effects for the shears and watering can, and animation-driven footstep sounds with randomized pitch for variation.
+        </p>
+
+        <h2>Tools &amp; Tech</h2>
+        <p>
+            The project was built in <strong>Unreal Engine</strong> using <strong>Blueprints</strong>. Version control was handled through <strong>Perforce</strong>. The team used agile sprints to organize work throughout the block.
+        </p>
+
+        <h2>Credits</h2>
+        <p>
+            Bloom was made by a team at Breda University of Applied Sciences. For the full credits list, visit the <a href="https://buas.itch.io/bloom" target="_blank">itch.io page</a>.
+        </p>
+
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://github.com/Flumming" target="_blank">GitHub</a>
+            <a href="https://flumming.itch.io" target="_blank">itch.io</a>
+            <a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/" target="_blank">LinkedIn</a>
+        </div>
+    </footer>
+
+    <script>
+        const toggle = document.getElementById('theme-toggle');
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            toggle.textContent = document.body.classList.contains('light-mode') ? '🌙 Dark' : '☀️ Light';
+        });
+    </script>
+
+</body>
+</html>

@@ -17,7 +17,7 @@
         <button id="theme-toggle">☀️ Light</button>
     </nav>
 
-    <header>
+    <header style="background-image: url('../assets/terraingenerator/background.png');">
         <h1>Procedural Terrain Generation</h1>
         <div class="author-info">
             <p>By Flemming van der Sande</p>
@@ -53,7 +53,7 @@ for (int y = 0; y &lt; height; y++) {
         <h3>Step Two: Elevation</h3>
         <p>Now that you have the height data for your terrain you need to apply it to a mesh. I start with creating a flat plane mesh and then for each vertex, I check the noise map to find the corresponding height based on its position.</p>
         <p>When applying the heightmap directly to a flat plane, it looks like this:</p>
-        <img src="../assets/2elevation/heightn1.png" alt="MeshHeightMap" width="400" height="400">
+        <img src="../assets/terraingenerator/2elevation/heightn1.png" alt="MeshHeightMap" width="400" height="400">
         
         <p>The issue with this terrain is that it looks really bland, It doesn't have high mountains or flat land. You can fix this by raising the height to a power. Raising the height to a power changes the shape of the noise curve, which helps exaggerate the terrain. If you use a power less than 1, you get more flat areas like plains or plateaus. If you use a power greater than 1, it pushes the lower areas down and pulls the higher areas up, creating steeper mountains and deeper valleys.</p>
 <pre><code class="language-cpp">for (int y = 0; y &lt; height; y++) {
@@ -67,22 +67,22 @@ for (int y = 0; y &lt; height; y++) {
 
         <div class="image-container">
             <div class="image-text">n=1</div>
-            <img src="../assets/2elevation/2heightn1.png" alt="MeshHeightMap" width="150" height="150">
+            <img src="../assets/terraingenerator/2elevation/2heightn1.png" alt="MeshHeightMap" width="150" height="150">
         </div>
 
         <div class="image-container">
             <div class="image-text">n=2</div>
-            <img src="../assets/2elevation/2heightn2.png" alt="MeshHeightMap" width="150" height="150">
+            <img src="../assets/terraingenerator/2elevation/2heightn2.png" alt="MeshHeightMap" width="150" height="150">
         </div>
 
         <div class="image-container">
             <div class="image-text">n=3</div>
-            <img src="../assets/2elevation/2heightn3.png" alt="MeshHeightMap" width="150" height="150">
+            <img src="../assets/terraingenerator/2elevation/2heightn3.png" alt="MeshHeightMap" width="150" height="150">
         </div>
 
         <div class="image-container">
             <div class="image-text">n=4</div>
-            <img src="../assets/2elevation/2heightn4.png" alt="MeshHeightMap" width="150" height="150">
+            <img src="../assets/terraingenerator/2elevation/2heightn4.png" alt="MeshHeightMap" width="150" height="150">
         </div>
 
         <h3>Step Three: Colors</h3>
@@ -159,21 +159,21 @@ vec3 blendColor(float blendRange, float height, int index) {
         
         <h3>Step Four: Biomes</h3>
         <p>Now that the terrain has some color you want to add some variation. I have done this by adding biomes. I first generate two noise maps, one for temperature and one for moisture. In the table below you can see what biome I assign to what moisture and temperature values. This produces a nice looking biome map where for example desert and snow biomes won't share a border.</p>
-        <img src="../assets/4biomes/biomeTable.png" alt="biomeTable" width="900" height="450">
+        <img src="../assets/terraingenerator/4biomes/biomeTable.png" alt="biomeTable" width="900" height="450">
 
         <div class="image-container">
             <div class="image-text">Moisture map</div>
-            <img src="../assets/4biomes/zmoistureTexture.png" alt="MeshHeightMap" width="250" height="250">
+            <img src="../assets/terraingenerator/4biomes/zmoistureTexture.png" alt="MeshHeightMap" width="250" height="250">
         </div>
 
         <div class="image-container">
             <div class="image-text">Temperature map</div>
-            <img src="../assets/4biomes/ztemperatureTexture.png" alt="MeshHeightMap" width="250" height="250">
+            <img src="../assets/terraingenerator/4biomes/ztemperatureTexture.png" alt="MeshHeightMap" width="250" height="250">
         </div>
 
         <div class="image-container">
             <div class="image-text">Final biome map</div>
-            <img src="../assets/4biomes/biomeMap.png" alt="MeshHeightMap" width="250" height="250">
+            <img src="../assets/terraingenerator/4biomes/biomeMap.png" alt="MeshHeightMap" width="250" height="250">
         </div>
         
         <p>For each biome there is now a vector of TerrainColor structs so that each biome can have different colors. In the shader it first calculates which index should be used for getting the colors, this is done in this function.</p>
@@ -228,7 +228,7 @@ int getBiomeIndex(float moisture, float temperature) {
 
         <p>This function kind of works the same as the GetColor function. But for this one it first calculates the texture coordinate in the texture using the texture position. It then goes over the color map of the current biome. If it is at the correct height it returns the color of the pixel in the texture corresponding to that biome and height.</p>
         <p>This is how the terrain now looks when applying the texture to the terrain</p>
-        <img src="../assets/5textures/textureexample.png" alt="texturing" width="400" height="400">
+        <img src="../assets/terraingenerator/5textures/textureexample.png" alt="texturing" width="400" height="400">
         
         <h3>Step Six: Details</h3>
         <p>Although the terrain looks much better with textures, sharp transitions between colors and textures at different heights still doesn't look great. This can be fixed by blending the two bordering colors and textures together. This is done by checking if it is within the blendRange and then smoothly interpolating between the two bordering colors and textures.</p>
@@ -254,7 +254,7 @@ vec3 blendColor(float blendRange, float height, biome_struct currentBiome, int i
 }</code></pre>
 
         <p>When applying the blending between colors and textures it will look like this:</p>
-        <img src="../assets/6details/textureBlended.png" alt="blendedTexturing" width="400" height="400">
+        <img src="../assets/terraingenerator/6details/textureBlended.png" alt="blendedTexturing" width="400" height="400">
 
         <p>Another way to enhance the visual aspect of the terrain is to add a different color and texture if the terrain has a specific angle. I calculate the angle based on the mesh normal, after that I apply a different color and texture to that part of the mesh.</p>
 <pre><code class="language-glsl">vec3 normal = normalize(v_normal);
@@ -262,24 +262,24 @@ float slopeRadians = acos(normal.y);
 float slope = degrees(slopeRadians);</code></pre>
 
         <p>In the image below you can see that where the terrain is steeper than 45 degrees, the terrain gets a different color.</p>
-        <img src="../assets/6details/slopeTexture.png" alt="slopeTexture" width="200" height="300">
+        <img src="../assets/terraingenerator/6details/slopeTexture.png" alt="slopeTexture" width="200" height="300">
         
         <p>Another useful feature is the ability to dynamically change the colors and textures of each biome while the program is running. I utilize ImGui for data input and then update the BiomeDataUBO uniform.</p>
         <p>The image below shows how the editable data is displayed within the program.</p>
-        <img src="../assets/6details/imguiEditable.png" alt="imguiEditable" width="400" height="300">
+        <img src="../assets/terraingenerator/6details/imguiEditable.png" alt="imguiEditable" width="400" height="300">
         
         <h2>Results</h2>
         <p>The final terrain generator successfully creates random, realistic landscapes with biomes, textures, and smooth transitions. One of the key features is the ability to modify biome data like biome colors, texture, and height. This makes it very useful for tweaking and achieving a desired look.</p>
 
         <p>In the video below, you can see how the terrain responds to changes in real-time. Changing biome colors, textures and adding new colors are happening instantly, showcasing the flexibility of the system.</p>
         <video width="100%" height="100%" controls>
-            <source src="../assets/result/terrain-demo.mp4" type="video/mp4">
+            <source src="../assets/terraingenerator/result/terrain-demo.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         
         <p>Additionally here are two examples of what sort of terrain the generator can make.</p>
-        <img src="../assets/result/terrain1.png" alt="terrain example 1" width="350">
-        <img src="../assets/result/terrain2.png" alt="terrain example 2" width="350">
+        <img src="../assets/terraingenerator/result/terrain1.png" alt="terrain example 1" width="350">
+        <img src="../assets/terraingenerator/result/terrain2.png" alt="terrain example 2" width="350">
 
         <h2>Improvements</h2>
         <p>While the terrain generator achieves great results, there are still some areas that could be improved to enhance the final output:</p>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedural City Generator - Flemming van der Sande</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="../index.html">Home</a>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#contact">Contact</a>
+        <button id="theme-toggle">🌙 Theme</button>
+    </nav>
+
+    <header style="background-image: url('../assets/citygenerator/banner.png');">
+        <h1>Procedural City Generator</h1>
+        <div class="author-info">
+            Solo Project · C++ · Unreal Engine Plugin · Year 3 at BUas
+        </div>
+    </header>
+
+    <div class="container">
+
+        <h2>Overview</h2>
+        <p>
+            For a 8 wekk long project in my third year at Breda University of Applied Sciences, I built a <strong>procedural city generator as an Unreal Engine plugin</strong>. Given a boundary and a set of parameters, the system generates a full city layout. Roads, intersections, sidewalks, and buildings, entirely at runtime using procedural mesh generation.
+        </p>
+        <p>
+            The project was highly iterative, with most systems going through multiple redesigns before reaching a stable result. The focus was on solving geometric and algorithmic challenges rather than visual polish.
+        </p>
+
+        <h2>Features</h2>
+
+        <h3>Graph-Based Road Network</h3>
+        <p>
+            The city starts with a road graph. Seed nodes are placed within a random boundary polygon and recursively expanded by connecting neighbors under spatial constraints. The algorithm prevents overlapping roads, limits connection count, and splits long edges to maintain a natural-looking layout.
+        </p>
+
+        <h3>Road &amp; Intersection Geometry</h3>
+        <p>
+            From the graph data, I generated road meshes and intersection geometry with proper UV mapping. Straight roads were relatively straightforward, but intersections required splitting into separate parts to handle texturing correctly, this was one of the most time-consuming parts of the project.
+        </p>
+        <img src="../assets/citygenerator/intersection.png" alt="Road and intersection mesh generation">
+
+        <h3>Face Detection &amp; Subdivision</h3>
+        <p>
+            The road network is split into faces by traversing edges in a clockwise direction until a closed loop is found. These faces represent city blocks. The system then recursively subdivides larger faces by generating new roads within them, creating a layered street hierarchy.
+        </p>
+        <img src="../assets/citygenerator/faces.png" alt="Detected faces and city blocks">
+
+        <h3>Sidewalks &amp; Buildings</h3>
+        <p>
+            Sidewalks are generated as offset geometry along block edges, with special handling for convex and concave corners. Buildings are placed around the perimeter of each city block with randomized dimensions. The system checks for overlap with roads, sidewalks, and other buildings, and aligns corner buildings to avoid collisions.
+        </p>
+        <img src="../assets/citygenerator/buildings.png" alt="Generated sidewalks and buildings">
+
+        <h3>City Regions</h3>
+        <p>
+            City blocks are assigned a region type based on their distance from the center. Each region generates different building styles, for example, residential areas spawn houses with fences, while blocks closer to the center produce taller structures.
+        </p>
+
+        <h2>What I Learned</h2>
+        <p>
+            This project taught me a lot about graph algorithms, procedural geometry generation, and working with Unreal Engine's procedural mesh system at a low level. Most importantly, it reinforced the value of sketching out problems before jumping into code, several systems only came together after I paused to plan the geometry on paper first.
+        </p>
+
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://github.com/Flumming" target="_blank">GitHub</a>
+            <a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/" target="_blank">LinkedIn</a>
+        </div>
+    </footer>
+
+    <script>
+        const toggle = document.getElementById('theme-toggle');
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            toggle.textContent = document.body.classList.contains('light-mode') ? '🌙 Dark' : '☀️ Light';
+        });
+    </script>
+
+</body>
+</html>

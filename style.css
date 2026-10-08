@@ -340,6 +340,10 @@ p {
     max-width: var(--measure);
 }
 
+.project.featured .project-body .specs {
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+}
+
 /* ---------- Spec line (role, team, duration, tech) ---------- */
 
 .specs {

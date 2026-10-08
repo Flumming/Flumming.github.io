@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spirit Cleansers, Flemming van der Sande</title>
+    <meta name="description" content="Spirit Cleansers, a turn-based strategy game released on Steam. I built the combat HUD, the dialogue system, menus and data-driven tools for designers in Unreal Engine.">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Spirit Cleansers, Flemming van der Sande">
+    <meta property="og:description" content="UI, tools and gameplay programming on a turn-based strategy game released on Steam.">
+    <meta property="og:url" content="https://flumming.github.io/projects/spirit-cleansers.html">
+    <meta property="og:image" content="https://flumming.github.io/assets/spirit-cleansers/cover.jpg">
+    <script>try{if(localStorage.getItem('theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}</script>
+    <link rel="stylesheet" href="../style.css?v=3">
+</head>
+<body>
+    <header class="site-bar">
+        <div class="wrap">
+            <a class="site-name" href="../index.html">Flemming van der Sande</a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="../index.html#projects">Projects</a>
+                <a href="../index.html#contact">Contact</a>
+                <a href="../assets/cv/Flemming_van_der_Sande_CV.pdf" download>CV</a>
+                <button id="theme-toggle" type="button">Light</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <div class="page-head">
+            <a class="back-link" href="../index.html#projects">All projects</a>
+            <h1>Spirit Cleansers</h1>
+            <p class="lede">A turn-based strategy game where you explore a haunted estate and fight spirits as a priest and a warrior. Made by a student team at BUas and released on Steam in May 2026.</p>
+            <dl class="specs">
+                <div><dt>Role</dt><dd>UI, tools and gameplay programmer</dd></div>
+                <div><dt>Team</dt><dd>21 people: 6 programming, 8 visual art, 7 design and production</dd></div>
+                <div><dt>Duration</dt><dd>24 weeks, year 3 (2025/26)</dd></div>
+                <div><dt>Tech</dt><dd>Unreal Engine, Blueprints, Perforce, Jira</dd></div>
+            </dl>
+            <ul class="link-row">
+                <li><a class="button" href="https://store.steampowered.com/app/4508350/Spirit_Cleansers/">View on Steam</a></li>
+            </ul>
+        </div>
+
+        <figure class="lead-media">
+            <video src="../assets/spirit-cleansers/trailer.mp4" poster="../assets/spirit-cleansers/cover.jpg" width="1280" height="720" controls preload="none" playsinline></video>
+            <figcaption>Release trailer.</figcaption>
+        </figure>
+
+        <article class="prose">
+            <h2>What I built</h2>
+            <p>
+                I worked on Spirit Cleansers for three blocks, from concept to the Steam release.
+                In the last block I was on the "feedback and feel" strike team, which owned UI, VFX, SFX and animation. My part was the UI.
+                Over the project I built:
+            </p>
+            <ul>
+                <li>the combat HUD: abilities, action points, health bars with a damage preview and ability descriptions, later rebuilt with the final art</li>
+                <li>the dialogue system on top of the Mountea Dialogue System plugin: responses, speaker portraits, trigger boxes and a letter-by-letter text reveal</li>
+                <li>a data-driven command system so dialogue can trigger gameplay events</li>
+                <li>a data-driven onboarding system that designers edit through data tables</li>
+                <li>the title, pause, settings, loading, credits and controls screens, with controller support</li>
+                <li>one interface settings menu for UI scale and font</li>
+            </ul>
+            <p>
+                During concepting the combat was a deck-builder, and I built the card system for that prototype (deck, hand and playing cards).
+                Everything was made in Blueprints, reviewed through a Perforce code review pipeline and planned in Jira.
+            </p>
+
+            <h2>Technical details</h2>
+
+            <h3>Combat HUD</h3>
+            <figure>
+                <img src="../assets/spirit-cleansers/combat-hud.jpg" alt="Combat with the final HUD: ability scroll on the left, action points and end turn button" width="1600" height="822" loading="lazy">
+            </figure>
+            <p>
+                The HUD shows the abilities of the active character, the action points left, and a description panel with the cost, range and damage of the selected ability.
+                Buttons grey out when the player doesn't have enough action points, and everything works with mouse and controller.
+                In the last block I rebuilt the layout around the new art together with the UI artist, who sent assets in passes while I put them in and shared the result in-game.
+            </p>
+            <p>
+                The HUD widget doesn't store the abilities itself. They live in an ability component on the player character, and the HUD reads them from there when it rebuilds its buttons.
+                Other systems, like the combat manager and character switching, need the same data, so the character is the one place that owns it.
+                I tried to keep widgets as views that read state instead of owning it.
+            </p>
+            <p>
+                The ability buttons talk to the HUD through event dispatchers (pressed, hover, unhover) instead of direct references, so several parts of the HUD can react to one press without the button knowing about them.
+                The player controller tells the HUD to switch characters through a Blueprint Interface, so it doesn't need to know the widget type.
+                After a code review comment, I also changed the ability buttons so they are no longer rebuilt every frame.
+            </p>
+            <figure>
+                <img src="../assets/spirit-cleansers/combat-hud-diagram.png" alt="Diagram of the combat HUD: the player character owns the abilities, the HUD reads them and talks to its child widgets and the player controller" width="1011" height="532" loading="lazy">
+                <figcaption>How the combat HUD widgets, the player character and the player controller talk to each other.</figcaption>
+            </figure>
+
+            <h4>Health bars and damage preview</h4>
+            <p>
+                The health bar is a world-space widget on each combat character, made of one segment widget per hit point. Players get green bars and enemies get red ones.
+                I looked at using a single progress bar, but health in the game is whole hit points, and segments show that more clearly.
+                Segments also made the damage preview simple: when you hover over an enemy with an ability selected, the segments you would remove start blinking, and a skull icon appears if the attack would kill.
+                With a progress bar I would have needed a second fill on top and exact percentages for the preview.
+            </p>
+            <figure>
+                <video src="../assets/spirit-cleansers/damage-preview.mp4" poster="../assets/spirit-cleansers/damage-preview-poster.jpg" width="628" height="464" autoplay muted loop playsinline aria-label="Hovering over an enemy makes the health segments that would be lost blink, with a skull icon because the attack would kill"></video>
+                <figcaption>Damage preview in an early build, before the final art.</figcaption>
+            </figure>
+
+            <h3>Dialogue text reveal</h3>
+            <figure>
+                <video src="../assets/spirit-cleansers/dialogue-reveal.mp4" poster="../assets/spirit-cleansers/dialogue-reveal-poster.jpg" width="800" height="450" autoplay muted loop playsinline aria-label="Dialogue text appearing letter by letter with a soft fade at the leading edge"></video>
+            </figure>
+            <p>
+                The dialogue text appears letter by letter with a scribble sound, and pressing continue shows the full line at once.
+                My first version set a growing substring of the line on the text block with a timer.
+                That worked, but the line breaks jumped around: a half-typed word could fit at the end of a line, and as soon as the next letter pushed it past the wrap width the whole word jumped to the next line.
+            </p>
+            <p>
+                I fixed it by always putting the full line in the text block and only changing the opacity per character with rich text style tags.
+                I made five styles with the same font and alpha values of 1, 0.75, 0.5, 0.25 and 0. Every 0.04 seconds the string is rebuilt from five parts:
+            </p>
+<pre><code>&lt;full&gt;{revealed so far}&lt;/&gt;&lt;f3&gt;{next char}&lt;/&gt;&lt;f2&gt;{char}&lt;/&gt;&lt;f1&gt;{char}&lt;/&gt;&lt;hidden&gt;{rest}&lt;/&gt;</code></pre>
+            <p>
+                Because the characters and their positions never change, the line breaks are calculated once and stay put, and the leading edge fades in over three characters instead of popping in.
+                Skipping clears the timer handle and writes the full text. That happens in the same event that starts the next line, so the cleanup is in one place.
+                I later reused the same idea for the text in the onboarding help boxes.
+            </p>
+
+            <h3>Dialogue commands and triggers</h3>
+            <p>
+                Designers needed dialogue to trigger things in the level, like starting combat.
+                One option was a custom decorator with hardcoded logic in the plugin for every case, but then every new command would need a programmer.
+                Instead, commands are rows in a data table. Each row has a command prefix and a target actor.
+                When a dialogue node has a command tag, a command manager looks up the row and calls the command on the target through a Blueprint Interface. Designers add new commands by adding a row.
+            </p>
+            <figure>
+                <img src="../assets/spirit-cleansers/dialogue-commands.png" alt="Data table with dialogue commands and their target actors" width="1213" height="108" loading="lazy">
+            </figure>
+            <p>
+                I also added speaker portraits looked up from a data table by the speaker tag, trigger boxes where designers pick which dialogue plays, an option to play a conversation only once,
+                player movement locking during dialogue, and an end-of-conversation interface so actors in the level can react when a conversation finishes.
+                In the last block I put in the new speech bubble and dialogue box art.
+            </p>
+            <figure>
+                <img src="../assets/spirit-cleansers/dialogue.jpg" alt="Dialogue box with a speaker portrait in the released game" width="1280" height="770" loading="lazy">
+            </figure>
+
+            <h3>Onboarding system</h3>
+            <p>
+                The first onboarding system got harder to maintain with every help message we added, and designers needed me each time they wanted a new one.
+                I proposed rebuilding it around data and then built the new version:
+            </p>
+            <ul>
+                <li>an onboarding step struct with enums for the trigger condition and how a step completes</li>
+                <li>three help data tables that hold the text, so designers edit content without touching Blueprints</li>
+                <li>an onboarding manager behind a Blueprint Interface, so any system can trigger help without a direct reference</li>
+                <li>new triggers for action points, ending a turn and killing a cursed object</li>
+            </ul>
+            <p>
+                I moved the three onboarding combat levels over to the new system and checked that every message still showed up at the right moment.
+                In the final week a designer could add and change onboarding content without my help.
+            </p>
+
+            <h3>Menus and settings</h3>
+            <div class="figure-row">
+                <figure>
+                    <video src="../assets/spirit-cleansers/pause-menu.mp4" poster="../assets/spirit-cleansers/pause-menu-poster.jpg" width="800" height="450" autoplay muted loop playsinline aria-label="Pause menu with resume, main menu, feedback and quit buttons"></video>
+                    <figcaption>Pause menu</figcaption>
+                </figure>
+                <figure>
+                    <video src="../assets/spirit-cleansers/settings.mp4" poster="../assets/spirit-cleansers/settings-poster.jpg" width="800" height="448" autoplay muted loop playsinline aria-label="Settings menu with graphics, audio, controls and interface tabs"></video>
+                    <figcaption>Settings menu</figcaption>
+                </figure>
+            </div>
+            <p>
+                I built the title screen (with Rive animations on the buttons), the pause menu, the loading screen and the credits and controls pages, and connected the settings menu.
+                UI scale for the combat HUD, the dialogue box and the speech bubbles, plus the font choice, started as three separate accessibility tickets.
+                I combined them into one interface settings tab that reads from one save game, with a shared small, medium and large scale agreed with the designers.
+                I also fixed the controller hover state on menu buttons and the remaining UI bugs from the build review.
+            </p>
+            <figure>
+                <img src="../assets/spirit-cleansers/title-screen.jpg" alt="Title screen with play, quit, settings and credits buttons" width="1280" height="716" loading="lazy">
+            </figure>
+
+            <h3>A performance fix before release</h3>
+            <p>
+                I had built a character switching animation that used render targets. During a profiling session, tech design found that the render targets were loaded twice in the persistent level and took about a third of the render time.
+                Doing it properly would have taken more time than we had before the hotfix release, so the team agreed to disable it. I made and submitted the fix, and tech design measured the frame time going from 12.5 ms to 7.5 ms.
+            </p>
+
+            <h2>What I learned</h2>
+            <p>
+                The systems that worked best were the ones where I kept data apart from logic: the dialogue commands, the onboarding tables and the ability data.
+                Designers could then change things without waiting for me.
+                I also learned to check with designers and the UI artist before building something, for example agreeing on asset types before implementing a new HUD design, instead of reworking it afterwards.
+            </p>
+
+            <h2>Credits</h2>
+            <p>
+                Spirit Cleansers was made by team 1Derful at Breda University of Applied Sciences.
+                You can find the game on <a href="https://store.steampowered.com/app/4508350/Spirit_Cleansers/">Steam</a>.
+            </p>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">
+            <a href="../index.html">Flemming van der Sande</a>
+            <ul class="link-row">
+                <li><a href="https://github.com/Flumming">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/">LinkedIn</a></li>
+                <li><a href="https://flumming.itch.io/">itch.io</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="../script.js?v=3"></script>
+</body>
+</html>

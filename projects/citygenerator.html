@@ -3,86 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Procedural City Generator - Flemming van der Sande</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>City Generator, Flemming van der Sande</title>
+    <meta name="description" content="An Unreal Engine plugin in C++ that generates a city layout at runtime: roads, intersections, sidewalks and buildings.">
+    <script>try{if(localStorage.getItem('theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}</script>
+    <link rel="stylesheet" href="../style.css?v=3">
 </head>
 <body>
-
-    <nav>
-        <a href="../index.html">Home</a>
-        <a href="../index.html#projects">Projects</a>
-        <a href="../index.html#contact">Contact</a>
-        <button id="theme-toggle">🌙 Theme</button>
-    </nav>
-
-    <header style="background-image: url('../assets/citygenerator/banner.png');">
-        <h1>Procedural City Generator</h1>
-        <div class="author-info">
-            Solo Project · C++ · Unreal Engine Plugin · Year 3 at BUas
+    <header class="site-bar">
+        <div class="wrap">
+            <a class="site-name" href="../index.html">Flemming van der Sande</a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="../index.html#projects">Projects</a>
+                <a href="../index.html#contact">Contact</a>
+                <a href="../assets/cv/Flemming_van_der_Sande_CV.pdf" download>CV</a>
+                <button id="theme-toggle" type="button">Light</button>
+            </nav>
         </div>
     </header>
 
-    <div class="container">
+    <main class="wrap">
+        <div class="page-head">
+            <a class="back-link" href="../index.html#projects">All projects</a>
+            <h1>City Generator</h1>
+            <p class="lede">An Unreal Engine plugin that generates a city layout at runtime from a boundary and a set of parameters.</p>
+            <dl class="specs">
+                <div><dt>Role</dt><dd>Programmer</dd></div>
+                <div><dt>Team</dt><dd>Solo</dd></div>
+                <div><dt>Duration</dt><dd>8 weeks, year 3 (2025/26)</dd></div>
+                <div><dt>Tech</dt><dd>C++, Unreal Engine 5, Procedural Mesh</dd></div>
+            </dl>
+        </div>
 
-        <h2>Overview</h2>
-        <p>
-            For a 8 wekk long project in my third year at Breda University of Applied Sciences, I built a <strong>procedural city generator as an Unreal Engine plugin</strong>. Given a boundary and a set of parameters, the system generates a full city layout. Roads, intersections, sidewalks, and buildings, entirely at runtime using procedural mesh generation.
-        </p>
-        <p>
-            The project was highly iterative, with most systems going through multiple redesigns before reaching a stable result. The focus was on solving geometric and algorithmic challenges rather than visual polish.
-        </p>
+        <figure class="lead-media">
+            <img src="../assets/citygenerator/banner.png" alt="A generated city with roads, sidewalks and buildings" width="950" height="535">
+            <!-- TODO: if you record a gif or video of the city being generated, put it here instead of the banner, for example:
+            <video src="../assets/citygenerator/generate.mp4" poster="../assets/citygenerator/banner.png" autoplay muted loop playsinline width="1280" height="720"></video>
+            -->
+        </figure>
 
-        <h2>Features</h2>
+        <article class="prose">
+            <h2>What I built</h2>
+            <p>
+                For an 8 week project in my third year at Breda University of Applied Sciences, I built a procedural city generator as an Unreal Engine plugin.
+                Given a boundary and a set of parameters, it generates a full city layout at runtime using procedural mesh generation:
+            </p>
+            <ul>
+                <li>a road network built as a graph</li>
+                <li>road and intersection meshes with UV mapping</li>
+                <li>city blocks found from the road graph and subdivided into smaller streets</li>
+                <li>sidewalks and buildings placed around each block</li>
+                <li>city regions with different building styles</li>
+            </ul>
+            <p>
+                Most systems went through several redesigns before they worked well.
+                I focused on the geometry and the algorithms, not on visual polish.
+            </p>
 
-        <h3>Graph-Based Road Network</h3>
-        <p>
-            The city starts with a road graph. Seed nodes are placed within a random boundary polygon and recursively expanded by connecting neighbors under spatial constraints. The algorithm prevents overlapping roads, limits connection count, and splits long edges to maintain a natural-looking layout.
-        </p>
+            <h2>Technical details</h2>
 
-        <h3>Road &amp; Intersection Geometry</h3>
-        <p>
-            From the graph data, I generated road meshes and intersection geometry with proper UV mapping. Straight roads were relatively straightforward, but intersections required splitting into separate parts to handle texturing correctly, this was one of the most time-consuming parts of the project.
-        </p>
-        <img src="../assets/citygenerator/intersection.png" alt="Road and intersection mesh generation">
+            <h3>Graph-based road network</h3>
+            <p>
+                The city starts as a road graph. Seed nodes are placed inside a random boundary polygon and expanded by connecting them to neighbors under spatial constraints.
+                The algorithm prevents overlapping roads, limits the number of connections per node and splits long edges, so the layout looks more natural.
+            </p>
 
-        <h3>Face Detection &amp; Subdivision</h3>
-        <p>
-            The road network is split into faces by traversing edges in a clockwise direction until a closed loop is found. These faces represent city blocks. The system then recursively subdivides larger faces by generating new roads within them, creating a layered street hierarchy.
-        </p>
-        <img src="../assets/citygenerator/faces.png" alt="Detected faces and city blocks">
+            <h3>Road and intersection geometry</h3>
+            <p>
+                From the graph data I generate road meshes and intersection geometry with UV mapping.
+                Straight roads were fairly simple. Intersections had to be split into separate parts to get the texturing right, and this was one of the most time consuming parts of the project.
+            </p>
+            <figure>
+                <img src="../assets/citygenerator/intersection.png" alt="Generated road and intersection meshes" width="1312" height="408" loading="lazy">
+            </figure>
 
-        <h3>Sidewalks &amp; Buildings</h3>
-        <p>
-            Sidewalks are generated as offset geometry along block edges, with special handling for convex and concave corners. Buildings are placed around the perimeter of each city block with randomized dimensions. The system checks for overlap with roads, sidewalks, and other buildings, and aligns corner buildings to avoid collisions.
-        </p>
-        <img src="../assets/citygenerator/buildings.png" alt="Generated sidewalks and buildings">
+            <h3>Face detection and subdivision</h3>
+            <p>
+                The road network is split into faces by walking along the edges in a clockwise direction until a closed loop is found. These faces are the city blocks.
+                Larger faces are then subdivided recursively by generating new roads inside them, which gives a hierarchy of main roads and smaller streets.
+            </p>
+            <figure>
+                <img src="../assets/citygenerator/faces.png" alt="Detected faces, each one a city block" width="1366" height="480" loading="lazy">
+            </figure>
 
-        <h3>City Regions</h3>
-        <p>
-            City blocks are assigned a region type based on their distance from the center. Each region generates different building styles, for example, residential areas spawn houses with fences, while blocks closer to the center produce taller structures.
-        </p>
+            <h3>Sidewalks and buildings</h3>
+            <p>
+                Sidewalks are generated as offset geometry along the block edges, with separate handling for convex and concave corners.
+                Buildings are placed around the edge of each block with random dimensions.
+                The system checks for overlap with roads, sidewalks and other buildings, and aligns corner buildings so they don't collide.
+            </p>
+            <figure>
+                <img src="../assets/citygenerator/buildings.png" alt="Generated sidewalks and buildings along a city block" width="508" height="425" loading="lazy">
+            </figure>
 
-        <h2>What I Learned</h2>
-        <p>
-            This project taught me a lot about graph algorithms, procedural geometry generation, and working with Unreal Engine's procedural mesh system at a low level. Most importantly, it reinforced the value of sketching out problems before jumping into code, several systems only came together after I paused to plan the geometry on paper first.
-        </p>
+            <h3>City regions</h3>
+            <p>
+                Each city block gets a region type based on its distance from the center, and each region uses different building styles.
+                For example, residential blocks spawn houses with fences, while blocks closer to the center get taller buildings.
+            </p>
+            <!-- TODO: screenshot of the different city regions (optional)
+            <figure>
+                <img src="../assets/citygenerator/regions.png" alt="City regions with different building styles" loading="lazy">
+            </figure>
+            -->
 
-    </div>
+            <h2>What I learned</h2>
+            <p>
+                I learned a lot about graph algorithms, procedural geometry and using Unreal Engine's procedural mesh system at a low level.
+                It also showed me the value of sketching a problem before writing code. Several systems only came together after I stopped and worked out the geometry on paper first.
+            </p>
+        </article>
+    </main>
 
-    <footer>
-        <div class="social-links">
-            <a href="https://github.com/Flumming" target="_blank">GitHub</a>
-            <a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/" target="_blank">LinkedIn</a>
+    <footer class="site-footer">
+        <div class="wrap">
+            <a href="../index.html">Flemming van der Sande</a>
+            <ul class="link-row">
+                <li><a href="https://github.com/Flumming">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/">LinkedIn</a></li>
+                <li><a href="https://flumming.itch.io/">itch.io</a></li>
+            </ul>
         </div>
     </footer>
 
-    <script>
-        const toggle = document.getElementById('theme-toggle');
-        toggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
-            toggle.textContent = document.body.classList.contains('light-mode') ? '🌙 Dark' : '☀️ Light';
-        });
-    </script>
-
+    <script src="../script.js?v=3"></script>
 </body>
 </html>

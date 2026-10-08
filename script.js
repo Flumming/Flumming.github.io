@@ -1,56 +1,38 @@
-// Theme Toggle
+// Theme toggle. Dark is the default. The choice is saved so it carries
+// over between pages. Each page also has a one-line script in <head>
+// that applies the saved theme before the page is drawn.
+const root = document.documentElement;
 const themeToggle = document.getElementById('theme-toggle');
-const body = document.body;
 
-themeToggle.addEventListener('click', () => {
-    body.classList.toggle('light-mode');
-    if (body.classList.contains('light-mode')) {
-        themeToggle.textContent = '🌙 Dark';
-    } else {
-        themeToggle.textContent = '☀️ Light';
-    }
-});
+function updateToggleLabel() {
+    const isLight = root.dataset.theme === 'light';
+    themeToggle.textContent = isLight ? 'Dark' : 'Light';
+    themeToggle.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
+}
 
-// Scroll Animations
-const sections = document.querySelectorAll('section');
-
-if (sections.length > 0) {
-    // Add initial hidden state
-    sections.forEach(section => {
-        section.style.opacity = '0';
-        section.style.transform = 'translateY(30px)';
-        section.style.transition = 'opacity 0.6s, transform 0.6s';
-    });
-
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    sections.forEach(section => {
-        observer.observe(section);
+if (themeToggle) {
+    updateToggleLabel();
+    themeToggle.addEventListener('click', () => {
+        if (root.dataset.theme === 'light') {
+            delete root.dataset.theme;
+        } else {
+            root.dataset.theme = 'light';
+        }
+        try {
+            localStorage.setItem('theme', root.dataset.theme || 'dark');
+        } catch (e) {
+            // Storage can be blocked (private mode). The toggle still works for this page.
+        }
+        updateToggleLabel();
     });
 }
 
-// Smooth Scrolling
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+// Looping clips autoplay like gifs. If the visitor prefers reduced motion,
+// stop them and show the normal video controls instead.
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('video[autoplay]').forEach(video => {
+        video.pause();
+        video.removeAttribute('autoplay');
+        video.controls = true;
     });
-});
+}

@@ -3,131 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flemming van der Sande - Portfolio</title>
-    <link rel="stylesheet" href="style.css?v=2">
+    <title>Flemming van der Sande, gameplay and tools programmer</title>
+    <meta name="description" content="Portfolio of Flemming van der Sande, game programming student at BUas focused on gameplay and tools programming in C++ and Unreal Engine.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Flemming van der Sande, gameplay and tools programmer">
+    <meta property="og:description" content="Game programming student at BUas, focused on gameplay and tools programming. Looking for an internship starting early 2027.">
+    <meta property="og:url" content="https://flumming.github.io/">
+    <meta property="og:image" content="https://flumming.github.io/assets/citygenerator/banner.png">
+    <script>try{if(localStorage.getItem('theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}</script>
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-    <nav>
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#education">Education</a>
-        <a href="#contact">Contact</a>
-        <button id="theme-toggle">☀️ Light</button>
-    </nav>
+    <a class="skip-link" href="#projects">Skip to projects</a>
 
-    <header class="portfolio-header">
-        <div class="header-content">
-            <div class="header-left">
-                <div class="header-label">Portfolio</div>
-                <h1>
-                    <span class="name-first">Flemming</span>
-                    <span class="name-last">van der Sande</span>
-                </h1>
-                <p class="header-subtitle">Programmer student at Buas</p>
-            </div>
-            <div class="quick-projects">
-                <h3>Quick Access</h3>
-                <a href="blog/terraingenerator.html" class="project-button">
-                    <span>Terrain Generator</span>
-                </a>
-                <a href="projects/bloom.html" class="project-button">
-                    <span>Bloom</span>
-                </a>
-                <a href="projects/raytracer.html" class="project-button">
-                    <span>Voxel Ray Tracer</span>
-                </a>
-                <a href="projects/citygenerator" class="project-button">
-                    <span>City Generator</span>
-                </a>
-            </div>
+    <header class="site-bar">
+        <div class="wrap">
+            <a class="site-name" href="#top">Flemming van der Sande</a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="#projects">Projects</a>
+                <a href="#education">Education</a>
+                <a href="#contact">Contact</a>
+                <a href="assets/cv/Flemming_van_der_Sande_CV.pdf" download>CV</a>
+                <button id="theme-toggle" type="button">Light</button>
+            </nav>
         </div>
     </header>
 
-    <main>
-        <section id="about">
-            <h2>About Me</h2>
-            <p>I’m Flemming, a game programming student at BUAS with a strong focus on gameplay and tools programming.</p>
-            <p>I’m looking for an internship in the second half of the 2026/2027 academic year, where I can apply and grow my technical skills in a production environment.</p>
-            
+    <main id="top">
+        <section class="intro">
+            <div class="wrap">
+                <h1>Flemming van der Sande</h1>
+                <p class="tagline">Game programming student at BUas, focused on gameplay and tools programming.</p>
+                <p class="summary">
+                    I study Creative Media and Game Technologies at Breda University of Applied Sciences, and most of my work is in C++ and Unreal Engine.
+                    In autumn 2026 I'm on an exchange semester at Kristiania University College in Oslo.
+                    I'm looking for an internship in gameplay or tools programming starting early 2027.
+                </p>
+                <ul class="link-row">
+                    <li><a class="button" href="assets/cv/Flemming_van_der_Sande_CV.pdf" download>Download CV</a></li>
+                    <li><a href="mailto:flemming.vandersande@gmail.com">Email</a></li>
+                    <li><a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/">LinkedIn</a></li>
+                    <li><a href="https://github.com/Flumming">GitHub</a></li>
+                    <li><a href="https://flumming.itch.io/">itch.io</a></li>
+                </ul>
+            </div>
         </section>
 
+        <section id="projects" class="section">
+            <div class="wrap">
+                <h2 class="section-title">Projects</h2>
 
-        <section id="projects">
-            <h2>Projects</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <img src="assets/terraingenerator/background.png" alt="Terrain Generator Project">
-                    <h3>Terrain Generator</h3>
-                    <p>An interactive terrain generation project using procedural algorithms and advanced rendering techniques.</p>
-                    <a href="blog/terraingenerator.html">View Project →</a>
-                </div>
+                <div class="project-list">
 
-                <div class="project-card">
-                    <img src="assets/bloom/bloom-banner.png" alt="Project Two">
-                    <h3>Bloom</h3>
-                    <p>An eerie gardening game where you grow unnatural plants to feed the creature keeping you captive. I built core systems including inventory, shop, creature trading, diegetic UI, and audio integration in Unreal Engine.</p>
-                    <a href="projects/bloom.html">View Project →</a>
-                </div>
+                    <!-- ============================================================
+                         STEAM PROJECT SLOT (hidden until filled in)
+                         To show it on the site:
+                           1. Fill in the TODO parts below and in projects/steam-game.html
+                           2. Delete the line that says STEAM-PROJECT-START
+                           3. Delete the line that says STEAM-PROJECT-END
+                         ============================================================ -->
+                    <!-- STEAM-PROJECT-START
+                    <article class="project featured">
+                        <a class="project-media" href="projects/steam-game.html">
+                            <img src="assets/steam-game/cover.jpg" alt="TODO: describe the image" width="1600" height="900">
+                        </a>
+                        <div class="project-body">
+                            <h3><a href="projects/steam-game.html">TODO: Game name</a></h3>
+                            <dl class="specs">
+                                <div><dt>Role</dt><dd>TODO</dd></div>
+                                <div><dt>Team</dt><dd>TODO</dd></div>
+                                <div><dt>Duration</dt><dd>TODO</dd></div>
+                                <div><dt>Tech</dt><dd>TODO</dd></div>
+                            </dl>
+                            <p>TODO: one or two sentences about the game and what you built.</p>
+                            <ul class="link-row">
+                                <li><a href="projects/steam-game.html">Read more</a></li>
+                                <li><a href="TODO: Steam store URL">Steam page</a></li>
+                            </ul>
+                        </div>
+                    </article>
+                    STEAM-PROJECT-END -->
 
-                <div class="project-card">
-                    <img src="assets/raytracer/reflection.png" alt="Project Three">
-                    <h3>Voxel Ray Tracer</h3>
-                    <p>A CPU-based voxel ray tracer built in C++ featuring point lights, spotlights, reflections, glass refraction, an HDR skydome, and procedural world generation using Perlin noise.</p>
-                    <a href="projects/raytracer.html">View Project →</a>
-                </div>
+                    <article class="project">
+                        <a class="project-media" href="projects/citygenerator.html" tabindex="-1" aria-hidden="true">
+                            <img src="assets/citygenerator/banner.png" alt="" width="950" height="535">
+                        </a>
+                        <div class="project-body">
+                            <h3><a href="projects/citygenerator.html">City Generator</a></h3>
+                            <dl class="specs">
+                                <div><dt>Role</dt><dd>Programmer</dd></div>
+                                <div><dt>Team</dt><dd>Solo</dd></div>
+                                <div><dt>Duration</dt><dd>8 weeks, 2025/26</dd></div>
+                                <div><dt>Tech</dt><dd>C++, Unreal Engine 5</dd></div>
+                            </dl>
+                            <p>An Unreal Engine plugin that generates a city layout at runtime: roads, intersections, sidewalks and buildings. It builds a road graph, splits it into city blocks, subdivides them and then generates the meshes.</p>
+                            <a href="projects/citygenerator.html">Read more</a>
+                        </div>
+                    </article>
 
-                <div class="project-card">
-                    <img src="assets/citygenerator/banner.png" alt="Project Four">
-                    <h3>City Generator</h3>
-                    <p>An Unreal Engine plugin that generates full city layouts at runtime. Roads, intersections, sidewalks, and buildings, from a graph-based road network with recursive face subdivision and procedural mesh batching</p>
-                    <a href="projects/citygenerator.html">View Project →</a>
+                    <article class="project">
+                        <a class="project-media" href="projects/bloom.html" tabindex="-1" aria-hidden="true">
+                            <img src="assets/bloom/bloom-banner.jpg" alt="" width="1600" height="876" loading="lazy">
+                        </a>
+                        <div class="project-body">
+                            <h3><a href="projects/bloom.html">Bloom</a></h3>
+                            <dl class="specs">
+                                <div><dt>Role</dt><dd>Gameplay programmer</dd></div>
+                                <div><dt>Team</dt><dd>14 people</dd></div>
+                                <div><dt>Duration</dt><dd>8 weeks, 2024/25</dd></div>
+                                <div><dt>Tech</dt><dd>Unreal Engine, Blueprints</dd></div>
+                            </dl>
+                            <p>A gardening game where you grow strange plants to feed the creature that keeps you captive. I built the inventory, shop, creature trading, diegetic UI and audio integration.</p>
+                            <ul class="link-row">
+                                <li><a href="projects/bloom.html">Read more</a></li>
+                                <li><a href="https://buas.itch.io/bloom">Play on itch.io</a></li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="project">
+                        <a class="project-media" href="projects/terraingenerator.html" tabindex="-1" aria-hidden="true">
+                            <img class="focus-low" src="assets/terraingenerator/result/terrain2.png" alt="" width="899" height="655" loading="lazy">
+                        </a>
+                        <div class="project-body">
+                            <h3><a href="projects/terraingenerator.html">Terrain Generator</a></h3>
+                            <dl class="specs">
+                                <div><dt>Role</dt><dd>Programmer</dd></div>
+                                <div><dt>Team</dt><dd>Solo</dd></div>
+                                <div><dt>Duration</dt><dd>8 weeks, 2024/25</dd></div>
+                                <div><dt>Tech</dt><dd>C++, GLSL, ImGui</dd></div>
+                            </dl>
+                            <p>A terrain generator that turns Perlin noise into a textured mesh with biomes. Colors and textures blend by height and slope, and the biome data can be edited with ImGui while it runs.</p>
+                            <a href="projects/terraingenerator.html">Read more</a>
+                        </div>
+                    </article>
+
+                    <article class="project">
+                        <a class="project-media" href="projects/raytracer.html" tabindex="-1" aria-hidden="true">
+                            <img src="assets/raytracer/reflection.png" alt="" width="685" height="554" loading="lazy">
+                        </a>
+                        <div class="project-body">
+                            <h3><a href="projects/raytracer.html">Voxel Ray Tracer</a></h3>
+                            <dl class="specs">
+                                <div><dt>Role</dt><dd>Programmer</dd></div>
+                                <div><dt>Team</dt><dd>Solo</dd></div>
+                                <div><dt>Duration</dt><dd>8 weeks, 2023/24</dd></div>
+                                <div><dt>Tech</dt><dd>C++</dd></div>
+                            </dl>
+                            <p>A CPU voxel ray tracer with point lights, spotlights, reflections, glass refraction, an HDR skydome and a world generated with Perlin noise.</p>
+                            <a href="projects/raytracer.html">Read more</a>
+                        </div>
+                    </article>
+
                 </div>
             </div>
         </section>
 
-        <section id="education">
-            <h2>Education</h2>
-            <div class="experience-item">
-                <h3>Breda University of Applied Sciences, Breda, The Netherlands</h3>
-                <div class="date">2023 - Present</div>
-                <p>Programming student with a specialization in C++.</p>
-            </div>
-
-            <div class="experience-item">
-                <h3>Jacob-Roelandslyceum, Boxtel, The Netherlands</h3>
-                <div class="date">2017 - 2023</div>
+        <section id="education" class="section">
+            <div class="wrap">
+                <h2 class="section-title">Education</h2>
+                <ul class="timeline">
+                    <li>
+                        <div class="when">Autumn 2026</div>
+                        <div>
+                            <h3>Kristiania University College, Oslo, Norway</h3>
+                            <p>Exchange semester, Data Science 3.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="when">2023 to present</div>
+                        <div>
+                            <h3>Breda University of Applied Sciences, Breda, The Netherlands</h3>
+                            <p>Creative Media and Game Technologies, programming. Most of my courses and projects are in C++.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="when">2017 to 2023</div>
+                        <div>
+                            <h3>Jacob-Roelandslyceum, Boxtel, The Netherlands</h3>
+                            <p>Secondary school.</p>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </section>
 
-        <section id="contact">
-    <h2>Get In Touch</h2>
-    <div class="contact-content">
-        <p>I'm always open to new opportunities and collaborations. Feel free to reach out!</p>
-        <div style="display: flex; gap: 1.5rem; justify-content: center;">
-            <a href="mailto:flemming.vandersande@gmail.com" class="contact-email" title="Email">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="20" height="16" x="2" y="4" rx="2"/>
-                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                </svg>
-            </a>
-            <a href="https://discord.com/users/flumming" target="_blank" class="contact-email" title="Discord">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.947 2.418-2.157 2.418z"/>
-                </svg>
-            </a>
-        </div>
-    </div>
-</section>
+        <section id="contact" class="section contact">
+            <div class="wrap">
+                <h2 class="section-title">Contact</h2>
+                <p>Email is the easiest way to reach me. You can also find me on LinkedIn.</p>
+                <p><a class="email" href="mailto:flemming.vandersande@gmail.com">flemming.vandersande@gmail.com</a></p>
+                <ul class="link-row">
+                    <li><a class="button" href="assets/cv/Flemming_van_der_Sande_CV.pdf" download>Download CV</a></li>
+                    <li><a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/">LinkedIn</a></li>
+                    <li><a href="https://github.com/Flumming">GitHub</a></li>
+                    <li><a href="https://flumming.itch.io/">itch.io</a></li>
+                </ul>
+            </div>
+        </section>
     </main>
 
-    <footer>
-        <div class="social-links">
-            <a href="https://github.com/Flumming" title="GitHub">GitHub</a>
-            <a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/" title="LinkedIn">LinkedIn</a>
-            <a href="https://flumming.itch.io/" title="Itch">Itch</a>
+    <footer class="site-footer">
+        <div class="wrap">
+            <span>Flemming van der Sande</span>
+            <ul class="link-row">
+                <li><a href="https://github.com/Flumming">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/">LinkedIn</a></li>
+                <li><a href="https://flumming.itch.io/">itch.io</a></li>
+            </ul>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>

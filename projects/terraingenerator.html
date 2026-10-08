@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terrain Generator, Flemming van der Sande</title>
+    <meta name="description" content="A procedural terrain generator in C++ and GLSL with Perlin noise, biomes, height-based textures and an ImGui biome editor.">
+    <script>try{if(localStorage.getItem('theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="../style.css?v=3">
+</head>
+<body>
+    <header class="site-bar">
+        <div class="wrap">
+            <a class="site-name" href="../index.html">Flemming van der Sande</a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="../index.html#projects">Projects</a>
+                <a href="../index.html#contact">Contact</a>
+                <a href="../assets/cv/Flemming_van_der_Sande_CV.pdf" download>CV</a>
+                <button id="theme-toggle" type="button">Light</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <div class="page-head">
+            <a class="back-link" href="../index.html#projects">All projects</a>
+            <h1>Terrain Generator</h1>
+            <p class="lede">A procedural terrain generator with biomes, textures and a live editor for the biome data.</p>
+            <dl class="specs">
+                <div><dt>Role</dt><dd>Programmer</dd></div>
+                <div><dt>Team</dt><dd>Solo</dd></div>
+                <div><dt>Duration</dt><dd>8 weeks, year 2 (2024/25)</dd></div>
+                <!-- TODO: confirm the framework/graphics API (school framework? OpenGL?) and add it to Tech -->
+                <div><dt>Tech</dt><dd>C++, GLSL, ImGui</dd></div>
+            </dl>
+        </div>
+
+        <figure class="lead-media">
+            <video src="../assets/terraingenerator/result/terrain-demo.mp4" poster="../assets/terraingenerator/result/terrain-demo-poster.jpg" width="1280" height="720" controls preload="metadata" playsinline></video>
+            <figcaption>Changing biome colors and textures in the ImGui editor while the terrain updates.</figcaption>
+        </figure>
+
+        <article class="prose">
+            <h2>What I built</h2>
+            <p>A terrain generator that builds a mesh from a Perlin noise heightmap and colors and textures it per biome:</p>
+            <ul>
+                <li>a heightmap from layered Perlin noise (octaves), shaped with a power curve</li>
+                <li>colors based on height, with blending between the color bands</li>
+                <li>biomes picked from a temperature map and a moisture map</li>
+                <li>textures per biome and height, plus a separate color and texture for steep slopes</li>
+                <li>an ImGui editor to change biome colors, textures and heights while the program runs</li>
+            </ul>
+            <div class="figure-row">
+                <figure>
+                    <img src="../assets/terraingenerator/result/terrain1.png" alt="Generated terrain example" width="899" height="655" loading="lazy">
+                </figure>
+                <figure>
+                    <img src="../assets/terraingenerator/result/terrain2.png" alt="Another generated terrain example" width="899" height="655" loading="lazy">
+                </figure>
+            </div>
+
+            <h2>Technical details</h2>
+            <p class="note">I wrote the text below as a blog post for the assignment. It goes through the generator step by step.</p>
+
+            <h3>Introduction</h3>
+            <p>
+                The terrain of a game is really important, especially in an open-world game, because that's where you spend most of your time.
+                Creating realistic and dynamic terrain adds a lot to the experience of a game, but it's also one of the harder parts to get right.
+                In this post I'll go through how I made a basic terrain generator.
+            </p>
+
+            <h3>Step one: noise</h3>
+            <p>
+                The first step in creating terrain is generating a heightmap, which determines the elevation of the terrain at specific points.
+                To make this heightmap I use Perlin noise. Perlin noise is a way to generate random-looking patterns that are smooth and continuous, which makes it great for natural shapes like terrain.
+                Instead of just picking random values, it interpolates between gradients, so the result has no sharp jumps.
+            </p>
+            <p>In this code snippet you can see how I fill the noise vector.</p>
+<pre><code class="language-cpp">std::vector&lt;float&gt; noise(width * height);
+
+for (int y = 0; y &lt; height; y++) {
+    for (int x = 0; x &lt; width; x++) {
+        float noiseValue = perlin.octave2D(x ,y, octaves);
+        noise[index] = noiseValue;
+    }
+}</code></pre>
+            <p>The code goes over the width and height of the terrain and gets a value from a noise function from the siv::PerlinNoise library. It then stores this in an array for later use.</p>
+
+            <h4>Octaves</h4>
+            <p>
+                A map made with a single layer of Perlin noise does not have enough detail. To add more detail you increase the number of octaves.
+                Octaves are layers of noise added on top of each other, each one with a higher frequency and lower amplitude.
+                The first octave gives you the broad shape of the terrain, and the ones after that add smaller and smaller details. Combined, they give a more complex and realistic result.
+            </p>
+            <p>Here's the difference between using 1 octave and 4 octaves.</p>
+            <iframe class="juxtapose" title="Slider comparing 1 octave and 4 octaves of noise" loading="lazy" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=7c176a36-d8f2-11ef-9397-d93975fe8866"></iframe>
+
+            <h3>Step two: elevation</h3>
+            <p>
+                Now that you have the height data for your terrain, you need to apply it to a mesh.
+                I start with a flat plane mesh, and for each vertex I look up the height in the noise map based on its position.
+            </p>
+            <p>When applying the heightmap directly to a flat plane, it looks like this:</p>
+            <figure>
+                <img src="../assets/terraingenerator/2elevation/heightn1.png" alt="Heightmap applied directly to a flat plane" width="400" height="400" loading="lazy">
+            </figure>
+            <p>
+                The problem with this terrain is that it looks bland. It doesn't have high mountains or flat land. You can fix this by raising the height to a power, which changes the shape of the noise curve.
+                A power less than 1 gives you more flat areas like plains or plateaus.
+                A power greater than 1 pushes the lower areas down and pulls the higher areas up, which gives steeper mountains and deeper valleys.
+            </p>
+<pre><code class="language-cpp">for (int y = 0; y &lt; height; y++) {
+    for (int x = 0; x &lt; width; x++) {
+        float height = pow(noise[x + y * width], 4);
+        positions.push_back(vec3(x, terrainHeight, z));
+    }
+}</code></pre>
+            <p>This loop again goes over the width and height of the terrain. It gets the noise value from the noise vector, raises it to a power and sets the vertex height to the result.</p>
+            <p>The images below show what different powers do to the terrain.</p>
+            <div class="figure-row">
+                <figure>
+                    <img src="../assets/terraingenerator/2elevation/2heightn1.png" alt="Terrain with power 1" width="767" height="767" loading="lazy">
+                    <figcaption>n = 1</figcaption>
+                </figure>
+                <figure>
+                    <img src="../assets/terraingenerator/2elevation/2heightn2.png" alt="Terrain with power 2" width="767" height="767" loading="lazy">
+                    <figcaption>n = 2</figcaption>
+                </figure>
+                <figure>
+                    <img src="../assets/terraingenerator/2elevation/2heightn3.png" alt="Terrain with power 3" width="767" height="767" loading="lazy">
+                    <figcaption>n = 3</figcaption>
+                </figure>
+                <figure>
+                    <img src="../assets/terraingenerator/2elevation/2heightn4.png" alt="Terrain with power 4" width="767" height="767" loading="lazy">
+                    <figcaption>n = 4</figcaption>
+                </figure>
+            </div>
+
+            <h3>Step three: colors</h3>
+            <p>Now that you have the terrain mesh, the next step is to add color. I do this by making a list of terrain colors, each one for a specific height range, and applying them to the mesh.</p>
+<pre><code class="language-cpp">struct TerrainColor
+{
+    std::string name;
+    float height;
+    glm::vec3 color;
+};
+
+std::vector&lt;TerrainColor&gt; terrainColors = {
+    {"DeepWater",    0.20f, glm::vec3(35, 60, 182)},
+    {"Water",        0.30f, glm::vec3(46, 81, 255)},
+    {"Beach",        0.35f, glm::vec3(245, 245, 122)},
+    {"Grass",        0.55f, glm::vec3(24, 212, 11)},
+    {"HighGrass",    0.75f, glm::vec3(14, 135, 5)},
+    {"Mountain",     0.80f, glm::vec3(115, 113, 111)},
+    {"HighMountain", 0.95f, glm::vec3(56, 56, 55)},
+    {"Snow",         1.00f, glm::vec3(255, 255, 255)}
+};</code></pre>
+            <p>The shader uses these values to color the terrain. It gets the color from this function:</p>
+<pre><code class="language-glsl">vec3 getColor(float height) {
+    vec3 color = vec3(1.0);
+    for (int i = 0; i &lt; numItems; ++i) {
+        if (height &lt;= colorMap[i].colorHeight) {
+            color = colorMap[i].color.rgb;
+            break;
+        }
+    }
+    return color;
+}</code></pre>
+            <p>
+                The function takes the height as input and returns a color. It goes over the list of colors and checks if the height is lower than the height of the current entry.
+                If it is, it returns that color for the terrain.
+            </p>
+            <p>
+                After applying the height and color values to the mesh, I blend the edges between colors so they don't have jagged edges.
+                I do this by calculating how far a point is from a border and interpolating between the two bordering colors. I added the following code to the getColor function for this.
+            </p>
+<pre><code class="language-glsl">//Changed code in GetColor function
+for (int i = 0; i &lt; currentBiome.numItems; ++i) {
+    float blendRange = 0.05;
+    if (height &lt;= colorMap[i].colorHeight + blendRange) {
+        if (i == numItems) {
+            color = colorMap[i].color.rgb;
+        } else {
+            color = blendColor(blendRange, height, i);
+        }
+        break;
+    }
+}
+
+//Function for blending colors
+vec3 blendColor(float blendRange, float height, int index) {
+    vec3 color = vec3(1.0);
+    float lowerBound = colorMap[index].colorHeight - blendRange;
+    float upperBound = colorMap[index].colorHeight + blendRange;
+
+    if (height &gt;= lowerBound &amp;&amp; height &lt;= upperBound) {
+        float blendFactor = (height - lowerBound) / (upperBound - lowerBound);
+
+        vec3 lowerColor = colorMap[index].color.rgb;
+        vec3 upperColor = colorMap[index + 1].color.rgb;
+
+        color = mix(lowerColor, upperColor, blendFactor);
+    } else {
+        color = colorMap[index].color.rgb;
+    }
+    return color;
+}</code></pre>
+            <p>
+                The added code sets a blend range. The blendColor function checks if the height is near the edge where the color changes.
+                If so, it calculates a blend factor based on how far the height is from the color change, mixes the two colors and returns the result.
+            </p>
+            <p>With the slider below you can see the difference that blending the colors makes.</p>
+            <iframe class="juxtapose" title="Slider comparing colors without and with blending" loading="lazy" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=382e4a86-d95d-11ef-9397-d93975fe8866"></iframe>
+
+            <h3>Step four: biomes</h3>
+            <p>
+                Now that the terrain has color, the next step is variation. I did this by adding biomes. First I generate two noise maps, one for temperature and one for moisture.
+                The table below shows which biome I assign to which moisture and temperature values.
+                This gives a biome map where, for example, desert and snow biomes never share a border.
+            </p>
+            <figure>
+                <img src="../assets/terraingenerator/4biomes/biomeTable.png" alt="Table of biomes by moisture and temperature" width="1419" height="328" loading="lazy">
+            </figure>
+            <div class="figure-row">
+                <figure>
+                    <img src="../assets/terraingenerator/4biomes/zmoistureTexture.png" alt="Moisture noise map" width="1205" height="1205" loading="lazy">
+                    <figcaption>Moisture map</figcaption>
+                </figure>
+                <figure>
+                    <img src="../assets/terraingenerator/4biomes/ztemperatureTexture.png" alt="Temperature noise map" width="1205" height="1205" loading="lazy">
+                    <figcaption>Temperature map</figcaption>
+                </figure>
+                <figure>
+                    <img src="../assets/terraingenerator/4biomes/biomeMap.png" alt="Final biome map" width="563" height="563" loading="lazy">
+                    <figcaption>Final biome map</figcaption>
+                </figure>
+            </div>
+            <p>Each biome now has its own vector of TerrainColor structs, so every biome can have different colors. In the shader it first calculates which biome index to use for the colors, in this function:</p>
+<pre><code class="language-glsl">const int biomeTable[6][6] = int[][](
+    int[](0, 1, 2, 3, 3, 3),  // 0: Ice, 1: Tundra, 2: Grassland, 3: Desert
+    int[](0, 1, 2, 3, 3, 3),
+    int[](0, 1, 4, 4, 5, 5),  // 4: Forest, 5: Savanna
+    int[](0, 1, 6, 4, 5, 5),  // 6: Snow Forest
+    int[](0, 1, 6, 4, 7, 7),  // 7: Jungle
+    int[](0, 1, 6, 4, 7, 7)
+);
+
+int getBiomeIndex(float moisture, float temperature) {
+    for (int i = 0; i &lt; 6; ++i) {
+        if (moisture &gt;= moistureRanges[i] &amp;&amp; moisture &lt; moistureRanges[i + 1]) {
+            moistureIndex = i;
+            break;
+        }
+    }
+
+    for (int i = 0; i &lt; 6; ++i) {
+        if (temperature &gt;= temperatureRanges[i] &amp;&amp; temperature &lt; temperatureRanges[i + 1]) {
+            temperatureIndex = i;
+            break;
+        }
+    }
+    return biomeTable[moistureIndex][temperatureIndex];
+}</code></pre>
+            <p>
+                It first calculates the moisture index from the moisture noise map, and then does the same for the temperature.
+                It then looks up the biomeTable and returns an int for the biome at that point of the terrain.
+            </p>
+
+            <h3>Step five: textures</h3>
+            <p>
+                With the structure and biomes done, the next step is to make the terrain look nicer with textures.
+                The biome color structs now also have a texture ID next to the color and height values. This ID is the index in a texture list that is sent to the shader.
+            </p>
+            <p>The following code shows how I get a texture in the shader based on the biome index and height.</p>
+<pre><code class="language-glsl">vec3 getTexture(float height, int biomeIndex) {
+    int layer = 0;
+    biome_struct currentBiome = biomes[biomeIndex];
+    vec2 scaled_texture_coords = v_texture0 * terrainScale;
+    vec3 textureColor;
+
+    for (int i = 0; i &lt; currentBiome.numItems; ++i) {
+        if (height &lt;= currentBiome.colorMap[i].colorHeight) {
+            layer = currentBiome.colorMap[i].textureID;
+            textureColor = texture(s_terrain_texture_array,
+                                 vec3(scaled_texture_coords, layer)).rgb;
+            break;
+        }
+    }
+
+    return textureColor;
+}</code></pre>
+            <p>
+                This function works much like getColor. It first scales the texture coordinates, then goes over the color map of the current biome.
+                When it finds the right height, it returns the texture color for that biome and height.
+            </p>
+            <p>This is how the terrain looks with the textures applied:</p>
+            <figure>
+                <img src="../assets/terraingenerator/5textures/textureexample.png" alt="Terrain with textures applied per height" width="790" height="790" loading="lazy">
+            </figure>
+
+            <h3>Step six: details</h3>
+            <p>
+                The terrain looks much better with textures, but the sharp transitions between colors and textures at different heights still don't look great.
+                I fixed this by blending the two bordering colors and textures: if a point is within the blend range, it interpolates between them.
+            </p>
+<pre><code class="language-glsl">float blendRange = 0.05;
+if (height &lt;= currentBiome.colorMap[i].colorHeight + blendRange) {
+    color = blendColor(blendRange, height, currentBiome, i);
+    break;
+}
+
+vec3 blendColor(float blendRange, float height, biome_struct currentBiome, int index) {
+    vec3 color = vec3(1.0);
+    float lowerBound = currentBiome.colorMap[index].colorHeight - blendRange;
+    float upperBound = currentBiome.colorMap[index].colorHeight + blendRange;
+
+    float blendFactor = (height - lowerBound) / (upperBound - lowerBound);
+
+    vec3 lowerColor = currentBiome.colorMap[index].color.rgb;
+    vec3 upperColor = currentBiome.colorMap[index + 1].color.rgb;
+
+    color = mix(lowerColor, upperColor, blendFactor);
+    return color;
+}</code></pre>
+            <p>With blending between colors and textures, it looks like this:</p>
+            <figure>
+                <img src="../assets/terraingenerator/6details/textureBlended.png" alt="Terrain with blended textures" width="790" height="790" loading="lazy">
+            </figure>
+            <p>
+                Another way to improve the look of the terrain is to use a different color and texture where the terrain is steep.
+                I calculate the angle from the mesh normal and apply a different color and texture to that part of the mesh.
+            </p>
+<pre><code class="language-glsl">vec3 normal = normalize(v_normal);
+float slopeRadians = acos(normal.y);
+float slope = degrees(slopeRadians);</code></pre>
+            <p>In the image below, the terrain that is steeper than 45 degrees gets a different color.</p>
+            <figure class="portrait">
+                <img src="../assets/terraingenerator/6details/slopeTexture.png" alt="Steep slopes with a separate color" width="400" height="759" loading="lazy">
+            </figure>
+            <p>
+                I also made it possible to change the colors and textures of each biome while the program is running.
+                I use ImGui for the input and then update the BiomeDataUBO uniform buffer.
+            </p>
+            <p>The image below shows the editable data in the program.</p>
+            <figure>
+                <img src="../assets/terraingenerator/6details/imguiEditable.png" alt="ImGui window with editable biome data" width="570" height="327" loading="lazy">
+            </figure>
+
+            <h3>Results</h3>
+            <p>
+                The final terrain generator creates random landscapes with biomes, textures and smooth transitions.
+                The biome data, like colors, textures and heights, can be changed while it runs, which makes it easy to tweak the terrain to get a certain look.
+            </p>
+            <p>The video at the top of this page shows the terrain updating in real time when I change biome colors and textures and add new colors.</p>
+
+            <h3>Improvements</h3>
+            <p>There are still some things I would improve:</p>
+            <ul>
+                <li><strong>Biome blending</strong>: the transitions between biomes are abrupt, which gives ugly edges. Blending between biomes would make the transitions smoother and more natural.</li>
+                <li><strong>Biome specific height</strong>: the terrain height works the same in every biome. Height multipliers per biome would allow more variation, for example jungles that are flatter than the hills of grasslands.</li>
+            </ul>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">
+            <a href="../index.html">Flemming van der Sande</a>
+            <ul class="link-row">
+                <li><a href="https://github.com/Flumming">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/flemming-van-der-sande-676b86212/">LinkedIn</a></li>
+                <li><a href="https://flumming.itch.io/">itch.io</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/glsl.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="../script.js?v=3"></script>
+</body>
+</html>

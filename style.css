@@ -477,6 +477,40 @@ p {
     margin-bottom: 1.5rem;
 }
 
+/* Title with an award badge on the right */
+.head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+}
+
+.award {
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.award-badge {
+    flex-shrink: 0;
+    width: 84px;
+}
+
+.award-badge img {
+    width: 100%;
+    height: auto;
+}
+
+.award-badge .on-light,
+:root[data-theme="light"] .award-badge .on-dark {
+    display: none;
+}
+
+:root[data-theme="light"] .award-badge .on-light {
+    display: block;
+}
+
 .page-head .specs {
     max-width: 880px;
 }
@@ -649,6 +683,10 @@ pre code.hljs {
 }
 
 @media (max-width: 520px) {
+    .award-badge {
+        width: 56px;
+    }
+
     body {
         font-size: 1rem;
     }
